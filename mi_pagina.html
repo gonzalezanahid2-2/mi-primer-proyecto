@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Mi primera página</title>
+
+    <style>
+        body {
+            background-color: pink;
+            text-align: center;
+            font-family: Arial;
+            color: black; 
+        }
+
+        h1 {
+            color: #2c3e50;
+        }
+
+        p {
+            color: #555;
+            font-size: 18px;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            margin: 5px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        li {
+            list-style: none;
+            background-color: white;
+            margin: 10px auto;
+            padding: 10px;
+            width: 220px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .completada {
+            text-decoration: line-through;
+            opacity: 0.6;
+        }
+
+        input {
+            padding: 5px;
+            border-radius: 5px;
+            border: 1px solid gray;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h2>Mis tareas</h2>
+    <p id="contador">Tareas: 0</p>
+
+    <input type="text" id="tarea" placeholder="Escribe una tarea">
+    <button onclick="agregarTarea()">Agregar</button>
+    <button onclick="borrarTodo()">Borrar todas</button>
+
+    <ul id="lista"></ul>
+
+    <h1>Hola, soy Anahid</h1>
+    <p>Estoy estudiando desarrollo de software me gusta aprender cosas nuevas y me adapto muy rapido </p>
+
+    <button onclick="cambiarColor()">Cambiar color</button>
+
+    <script>
+    function cambiarColor() {
+        let colores = ["red", "blue", "green", "purple", "orange", "pink"];
+        let colorAleatorio = colores[Math.floor(Math.random() * colores.length)];
+
+        document.body.style.backgroundColor = colorAleatorio;
+        localStorage.setItem("colorFondo", colorAleatorio);
+    }
+
+    function agregarTarea() {
+        let texto = document.getElementById("tarea").value;
+
+        if (texto.trim() === "") return;
+
+        let nuevaTarea = document.createElement("li");
+
+        let textoTarea = document.createElement("span");
+        textoTarea.innerText = texto;
+
+        textoTarea.onclick = function() {
+            textoTarea.classList.toggle("completada");
+            guardarTareas();
+        };
+
+        let botonEliminar = document.createElement("button");
+        botonEliminar.innerText = "Eliminar";
+
+        botonEliminar.onclick = function(evento) {
+            evento.stopPropagation();
+            nuevaTarea.remove();
+            guardarTareas();
+            actualizarContador(); 
+        };
+
+        nuevaTarea.appendChild(textoTarea);
+        nuevaTarea.appendChild(botonEliminar);
+        document.getElementById("lista").appendChild(nuevaTarea);
+
+        document.getElementById("tarea").value = "";
+document.getElementById("tarea").focus();
+        guardarTareas();
+        actualizarContador(); 
+    }
+
+    function guardarTareas() {
+        let lista = document.getElementById("lista").innerHTML;
+        localStorage.setItem("tareas", lista);
+    }
+
+    function actualizarContador() {
+        let total = document.querySelectorAll("#lista li").length;
+        document.getElementById("contador").innerText = "Tareas: " + total;
+    }
+
+    function borrarTodo() {
+        document.getElementById("lista").innerHTML = "";
+        localStorage.removeItem("tareas");
+        actualizarContador();
+    }
+
+    window.onload = function() {
+        let colorGuardado = localStorage.getItem("colorFondo");
+        if (colorGuardado) {
+            document.body.style.backgroundColor = colorGuardado;
+        }
+
+        let tareasGuardadas = localStorage.getItem("tareas");
+        if (tareasGuardadas) {
+            document.getElementById("lista").innerHTML = tareasGuardadas;
+
+            let tareas = document.querySelectorAll("#lista li");
+
+            tareas.forEach(function(tarea) {
+                let texto = tarea.querySelector("span");
+
+                texto.onclick = function() {
+                    texto.classList.toggle("completada");
+                    guardarTareas();
+                };
+
+                let boton = tarea.querySelector("button");
+
+                boton.onclick = function(evento) {
+                    evento.stopPropagation();
+                    tarea.remove();
+                    guardarTareas();
+                    actualizarContador();
+                };
+            });
+        }
+
+        actualizarContador(); 
+    }
+    document.getElementById("tarea").addEventListener("keydown", function(evento) {
+        if (evento.key === "Enter") {
+evento.preventDefault();
+            agregarTarea();
+        }
+    });
+    </script>
+
+</body>
+</html>
